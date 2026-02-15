@@ -120,7 +120,7 @@ Then use `isAuthenticated()` in server components and `preloadAuthQuery` for SSR
 
 **Fix:**
 ```bash
-npm install better-auth@1.4.9 --save-exact
+bun add better-auth@1.4.9 --exact
 ```
 
 ---
