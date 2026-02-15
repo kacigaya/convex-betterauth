@@ -13,7 +13,7 @@ A modern authentication application built with Next.js, featuring Convex as the 
 - Real-time data synchronization with Convex
 - Modern UI with Tailwind CSS v4 and Radix UI components
 - Dark mode support with system preference detection
-- Social authentication (Google, GitHub, Facebook, X)
+- Social authentication (Google)
 - Password strength validation with visual feedback
 - TypeScript for type safety
 

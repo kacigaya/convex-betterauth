@@ -45,9 +45,14 @@ export default function LoginPage() {
   };
 
   const handleSocialSignIn = async (provider: string) => {
-    await authClient.signIn.social({
+    setError("");
+    const result = await authClient.signIn.social({
       provider,
+      callbackURL: "/",
     });
+    if (result?.error) {
+      setError(result.error.message || "Social login failed");
+    }
   };
 
   return (
