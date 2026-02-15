@@ -1,6 +1,5 @@
 "use client";
 
-import { ConvexClientProvider } from "./convex";
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { authClient } from "@/lib/auth-client";
@@ -9,11 +8,12 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { LoaderOne } from "@/components/ui/loader";
+import { BottomGradient } from "@/components/ui/gradient";
 import DarkModeToggle from "@/components/darkmode-toggle";
 import SignInButton from "@/components/buttons/signin-b";
 import CreateAccountButton from "@/components/buttons/register-b";
 
-function AuthenticatedContent() {
+export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const user = useQuery(api.auth.getCurrentUser, isAuthenticated === true ? {} : "skip");
   const router = useRouter();
@@ -47,7 +47,7 @@ function AuthenticatedContent() {
       </div>
     );
   }
-  
+
   if (!isAuthenticated || !user) {
     return (
       <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center px-4">
@@ -55,31 +55,31 @@ function AuthenticatedContent() {
           <div className="flex justify-center">
             <DarkModeToggle />
           </div>
-            <div className="flex justify-center mt-4">
-              <Image src="/convex.ico" alt="logo" width={100} height={100} />
-              <Image
-                src="/betterauth-black.png"
-                alt="logo"
-                width={100}
-                height={100}
-                className="dark:hidden"
-              />
-              <Image
-                src="/betterauth-white.png"
-                alt="logo"
-                width={100}
-                height={100}
-                className="hidden dark:block"
-              />
-            </div>
+          <div className="flex justify-center mt-4">
+            <Image src="/convex.ico" alt="Convex logo" width={100} height={100} />
+            <Image
+              src="/betterauth-black.png"
+              alt="BetterAuth logo"
+              width={100}
+              height={100}
+              className="dark:hidden"
+            />
+            <Image
+              src="/betterauth-white.png"
+              alt="BetterAuth logo"
+              width={100}
+              height={100}
+              className="hidden dark:block"
+            />
+          </div>
           <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200 text-center mt-4">Convex + BetterAuth</h2>
           <p className="mt-2 max-w-xl text-sm text-neutral-600 dark:text-neutral-300 text-center">
             Open Source Authentication for your Next.js app by <Link href="https://github.com/gayakaci20" className="text-neutral-600 dark:text-neutral-300 font-bold">Gaya KACI</Link>
           </p>
-            <BottomGradient />
+          <BottomGradient />
           <div className="my-8 grid grid-cols-1 gap-3">
-            <SignInButton onClick={() => router.push("/login")}/>
-            <CreateAccountButton onClick={() => router.push("/register")}/>
+            <SignInButton onClick={() => router.push("/login")} />
+            <CreateAccountButton onClick={() => router.push("/register")} />
           </div>
         </div>
       </div>
@@ -131,22 +131,5 @@ function AuthenticatedContent() {
         </div>
       </div>
     </div>
-  );
-}
-
-const BottomGradient = () => {
-  return (
-    <>
-      <span className="absolute inset-x-0 -bottom-px block h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-0 transition duration-500 group-hover/btn:opacity-100" />
-      <span className="absolute inset-x-10 -bottom-px mx-auto block h-px w-1/2 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-0 blur-sm transition duration-500 group-hover/btn:opacity-100" />
-    </>
-  );
-};
-
-export default function Home() {
-  return (
-    <ConvexClientProvider>
-      <AuthenticatedContent />
-    </ConvexClientProvider>
   );
 }

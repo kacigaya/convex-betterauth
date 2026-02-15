@@ -7,11 +7,11 @@ import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import SocialLogin from "@/components/social-login";
-import SignInButton from "@/components/buttons/signin-b";
+import { LabelInputContainer } from "@/components/ui/label-input-container";
+import SocialAuth from "@/components/social-auth";
 import PasswordLogin from "@/components/input/password_login";
 import BackToHomeButton from "@/components/buttons/home";
+import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -54,22 +54,22 @@ export default function LoginPage() {
     <div className="min-h-screen bg-white dark:bg-black py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <div className="shadow-input mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
         <div className="flex justify-center mt-4 mb-4">
-              <Image src="/convex.ico" alt="logo" width={100} height={100} />
-              <Image
-                src="/betterauth-black.png"
-                alt="logo"
-                width={100}
-                height={100}
-                className="dark:hidden"
-              />
-              <Image
-                src="/betterauth-white.png"
-                alt="logo"
-                width={100}
-                height={100}
-                className="hidden dark:block"
-              />
-            </div>
+          <Image src="/convex.ico" alt="Convex logo" width={100} height={100} />
+          <Image
+            src="/betterauth-black.png"
+            alt="BetterAuth logo"
+            width={100}
+            height={100}
+            className="dark:hidden"
+          />
+          <Image
+            src="/betterauth-white.png"
+            alt="BetterAuth logo"
+            width={100}
+            height={100}
+            className="hidden dark:block"
+          />
+        </div>
         <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">
           Welcome back
         </h2>
@@ -105,13 +105,7 @@ export default function LoginPage() {
 
           <PasswordLogin value={password} onChange={setPassword} />
 
-          <SignInButton
-            onClick={() => {
-              const form = document.querySelector('form') as HTMLFormElement;
-              form?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-            }}
-            disabled={isLoading}
-          >
+          <Button type="submit" disabled={isLoading} className="w-full">
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
                 <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -123,15 +117,13 @@ export default function LoginPage() {
             ) : (
               "Sign in"
             )}
-          </SignInButton>
+          </Button>
         </form>
 
         <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
-        <SocialLogin onClick={handleSocialSignIn} />
+        <SocialAuth onClick={handleSocialSignIn} mode="login" />
         <div className="my-8 grid grid-cols-1 gap-3">
-          <BackToHomeButton
-            onClick={() => router.push("/")}
-          >
+          <BackToHomeButton onClick={() => router.push("/")}>
             Back to home →
           </BackToHomeButton>
         </div>
@@ -139,17 +131,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-const LabelInputContainer = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn("flex w-full flex-col space-y-2", className)}>
-      {children}
-    </div>
-  );
-};

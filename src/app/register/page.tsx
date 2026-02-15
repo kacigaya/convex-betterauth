@@ -7,12 +7,13 @@ import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
-import SocialRegister from "@/components/social-register";
+import { LabelInputContainer } from "@/components/ui/label-input-container";
+import { Button } from "@/components/ui/button";
+import SocialAuth from "@/components/social-auth";
 import Password from "@/components/input/password";
 import PasswordConfirm from "@/components/input/password_confirm";
-import RegisterButton2 from "@/components/buttons/register-a";
 import BackToHomeButton from "@/components/buttons/home";
+import { PASSWORD_REQUIREMENTS } from "@/lib/password-strength";
 
 export default function RegisterPage() {
   const [email, setEmail] = useState("");
@@ -33,18 +34,16 @@ export default function RegisterPage() {
       return;
     }
 
-    const requirements = [
-      { regex: /.{8,}/, text: "At least 8 characters" },
-      { regex: /[0-9]/, text: "At least 1 number" },
-      { regex: /[a-z]/, text: "At least 1 lowercase letter" },
-      { regex: /[A-Z]/, text: "At least 1 uppercase letter" },
-    ];
-
-    const unmetRequirements = requirements.filter(req => !req.regex.test(password));
+    const unmetRequirements = PASSWORD_REQUIREMENTS.filter(
+      (req) => !req.regex.test(password)
+    );
 
     if (unmetRequirements.length > 0) {
-      const errorMessages = unmetRequirements.map(req => `${req.text}- Requirement not met`);
-      setError(errorMessages.join('\n'));
+      setError(
+        unmetRequirements
+          .map((req) => `${req.text} - Requirement not met`)
+          .join("\n")
+      );
       setIsLoading(false);
       return;
     }
@@ -78,22 +77,22 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-white dark:bg-black py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <div className="shadow-input mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
         <div className="flex justify-center mt-4 mb-4">
-              <Image src="/convex.ico" alt="logo" width={100} height={100} />
-              <Image
-                src="/betterauth-black.png"
-                alt="logo"
-                width={100}
-                height={100}
-                className="dark:hidden"
-              />
-              <Image
-                src="/betterauth-white.png"
-                alt="logo"
-                width={100}
-                height={100}
-                className="hidden dark:block"
-              />
-            </div>
+          <Image src="/convex.ico" alt="Convex logo" width={100} height={100} />
+          <Image
+            src="/betterauth-black.png"
+            alt="BetterAuth logo"
+            width={100}
+            height={100}
+            className="dark:hidden"
+          />
+          <Image
+            src="/betterauth-white.png"
+            alt="BetterAuth logo"
+            width={100}
+            height={100}
+            className="hidden dark:block"
+          />
+        </div>
         <h2 className="text-2xl font-bold text-neutral-800 dark:text-neutral-200">
           Create your account
         </h2>
@@ -144,13 +143,7 @@ export default function RegisterPage() {
             </div>
           </LabelInputContainer>
 
-          <RegisterButton2
-            onClick={() => {
-              const form = document.querySelector('form') as HTMLFormElement;
-              form?.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-            }}
-            disabled={isLoading}
-          >
+          <Button type="submit" disabled={isLoading} className="w-full">
             {isLoading ? (
               <span className="flex items-center justify-center gap-2">
                 <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -162,15 +155,13 @@ export default function RegisterPage() {
             ) : (
               "Create account"
             )}
-          </RegisterButton2>
+          </Button>
         </form>
 
         <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
-        <SocialRegister onClick={handleSocialSignUp} />
+        <SocialAuth onClick={handleSocialSignUp} mode="register" />
         <div className="my-8 grid grid-cols-1 gap-3">
-          <BackToHomeButton
-            onClick={() => router.push("/")}
-          >
+          <BackToHomeButton onClick={() => router.push("/")}>
             Back to home →
           </BackToHomeButton>
         </div>
@@ -178,26 +169,3 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-const BottomGradient = () => {
-  return (
-    <>
-      <span className="absolute inset-x-0 -bottom-px block h-px w-full bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-0 transition duration-500 group-hover/btn:opacity-100" />
-      <span className="absolute inset-x-10 -bottom-px mx-auto block h-px w-1/2 bg-gradient-to-r from-transparent via-indigo-500 to-transparent opacity-0 blur-sm transition duration-500 group-hover/btn:opacity-100" />
-    </>
-  );
-};
-
-const LabelInputContainer = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn("flex w-full flex-col space-y-2", className)}>
-      {children}
-    </div>
-  );
-};
