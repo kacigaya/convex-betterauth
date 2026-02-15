@@ -30,8 +30,7 @@ A modern authentication application built with Next.js, featuring Convex as the 
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
-- Node.js 20.9+
-- npm, yarn, pnpm, or bun
+- [Bun](https://bun.sh) (recommended) or Node.js 20.9+
 - A Convex account ([convex.dev](https://convex.dev))
 
 ## Setup Instructions
@@ -46,7 +45,7 @@ cd convex-betterauth
 ### 2. Install Dependencies
 
 ```bash
-npm install
+bun install
 ```
 
 ### 3. Environment Configuration
@@ -84,7 +83,7 @@ GOOGLE_CLIENT_SECRET=your-client-secret
 
 2. **Initialize Convex in your project**:
    ```bash
-   npx convex dev
+   bunx convex dev
    ```
 
    This will create a new Convex deployment and generate the necessary configuration.
@@ -102,7 +101,7 @@ Add this secret to your `.env.local` file as `BETTER_AUTH_SECRET`.
 ### 6. Run the Development Server
 
 ```bash
-npm run dev
+bun run dev
 ```
 
 The application will be available at [http://localhost:3000](http://localhost:3000).
@@ -141,10 +140,10 @@ convex-betterauth/
 
 ## Available Scripts
 
-- `npm run dev` - Start development server with Turbopack
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+- `bun run dev` - Start development server with Turbopack
+- `bun run build` - Build for production
+- `bun run start` - Start production server
+- `bun run lint` - Run ESLint
 
 ## Authentication Flow
 
