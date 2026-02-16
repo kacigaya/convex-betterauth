@@ -19,6 +19,7 @@ export const createAuth = (
       disabled: optionsOnly,
     },
     baseURL: siteUrl,
+    trustedOrigins: [siteUrl],
     database: authComponent.adapter(ctx),
     emailAndPassword: {
       enabled: true,

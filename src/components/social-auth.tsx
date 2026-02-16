@@ -1,8 +1,5 @@
 import {
-  RiFacebookFill,
-  RiGithubFill,
   RiGoogleFill,
-  RiTwitterXFill,
 } from "@remixicon/react"
 
 import { Button } from "@/components/ui/button"
@@ -14,9 +11,6 @@ interface SocialAuthProps {
 
 const providers = [
   { id: "google", label: "Google", icon: RiGoogleFill, bg: "bg-[#DB4437]", hover: "hover:bg-[#DB4437]/90" },
-  { id: "x", label: "X", icon: RiTwitterXFill, bg: "bg-[#14171a]", hover: "hover:bg-[#14171a]/90" },
-  { id: "facebook", label: "Facebook", icon: RiFacebookFill, bg: "bg-[#1877f2]", hover: "hover:bg-[#1877f2]/90" },
-  { id: "github", label: "GitHub", icon: RiGithubFill, bg: "bg-[#333333]", hover: "hover:bg-[#333333]/90" },
 ] as const;
 
 export default function SocialAuth({ onClick, mode }: SocialAuthProps) {
