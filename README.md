@@ -1,9 +1,4 @@
-<div style="display: flex; 
-             justify-content: center; 
-             align-items: center; 
-             gap: 20px; 
-             min-height: 100vh; 
-             width: 100%;">
+<div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin: 40px 0;">
   <img src="public/convex.ico" width="100" height="100" alt="Convex Logo">
   <img src="public/betterauth-white.png" width="100" height="100" alt="BetterAuth Logo">
 </div>
