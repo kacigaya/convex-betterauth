@@ -1,4 +1,4 @@
-<p align="center">
+<p align="center" style="display: flex; justify-content: center; align-items: center; gap: 40px;">
   <img src="public/convex.ico" alt="Logo" width="200">
   <img src="public/betterauth-white.png" alt="Logo" width="200">
 </p>
