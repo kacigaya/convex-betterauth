@@ -1,7 +1,7 @@
-<div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin: 40px 0;">
-  <img src="public/convex.ico" width="100" height="100" alt="Convex Logo">
-  <img src="public/betterauth-white.png" width="100" height="100" alt="BetterAuth Logo">
-</div>
+<p align="center">
+  <img src="public/convex.ico" alt="Logo" width="200">
+  <img src="public/betterauth-white.png" alt="Logo" width="200">
+</p>
 
 <h1 align="center">Convex + BetterAuth</h1>
 
