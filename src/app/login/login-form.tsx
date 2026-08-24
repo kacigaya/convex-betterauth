@@ -8,10 +8,19 @@ import { PasswordField } from "@/components/input/password-field";
 import SocialAuth, {
   type SocialProvider,
 } from "@/components/social-auth";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardPanel,
+  CardTitle,
+} from "@/components/ui/card";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { LabelInputContainer } from "@/components/ui/label-input-container";
+import { Separator } from "@/components/ui/separator";
 import { authClient } from "@/lib/auth-client";
 
 export function LoginForm({
@@ -77,89 +86,87 @@ export function LoginForm({
   };
 
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-white px-4 py-12 dark:bg-black">
-      <section className="mx-auto w-full max-w-md rounded-none bg-white p-4 shadow-input md:rounded-2xl md:p-8 dark:bg-black">
-        <AuthLogo />
-        <h1 className="mt-4 text-balance text-2xl font-bold text-neutral-800 dark:text-neutral-200">
-          Welcome back
-        </h1>
-        <p className="mt-2 max-w-sm text-pretty text-sm text-neutral-600 dark:text-neutral-300">
-          Sign in to your account to continue.{" "}
-          <Link
-            href="/register"
-            className="font-medium text-blue-700 underline-offset-4 hover:underline dark:text-blue-400"
-          >
-            Create one
-          </Link>
-        </p>
+    <main className="flex min-h-dvh items-center justify-center px-4 py-12">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <AuthLogo />
+          <CardTitle className="mt-4">Welcome back</CardTitle>
+          <CardDescription>
+            Sign in to your account to continue.{" "}
+            <Link
+              className="text-foreground underline underline-offset-4"
+              href="/register"
+            >
+              Create one
+            </Link>
+          </CardDescription>
+        </CardHeader>
 
-        {error ? (
-          <p
-            role="alert"
-            id="login-error"
-            className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300"
-          >
-            {error}
-          </p>
-        ) : null}
+        <CardPanel className="flex flex-col gap-4">
+          {error ? (
+            <Alert variant="error">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          ) : null}
 
-        <form
-          className="my-8 space-y-4"
-          onSubmit={handleSubmit}
-          aria-busy={isSubmitting}
-        >
-          <LabelInputContainer>
-            <Label htmlFor="login-email">Email address</Label>
-            <Input
-              id="login-email"
-              name="email"
-              type="email"
-              autoComplete="email"
+          <form
+            aria-busy={isSubmitting}
+            className="flex flex-col gap-4"
+            onSubmit={handleSubmit}
+          >
+            <Field>
+              <FieldLabel>Email address</FieldLabel>
+              <Input
+                autoComplete="email"
+                name="email"
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@example.com"
+                required
+                type="email"
+                value={email}
+              />
+            </Field>
+
+            <PasswordField
+              autoComplete="current-password"
+              label="Password"
+              maxLength={128}
+              minLength={8}
+              name="password"
+              onChange={(event) => setPassword(event.target.value)}
               required
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              aria-describedby={error ? "login-error" : undefined}
-              placeholder="you@example.com"
+              value={password}
             />
-          </LabelInputContainer>
 
-          <PasswordField
-            id="login-password"
-            label="Password"
-            name="password"
-            autoComplete="current-password"
-            required
-            minLength={8}
-            maxLength={128}
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            aria-describedby={error ? "login-error" : undefined}
+            <Button className="w-full" loading={isSubmitting} type="submit">
+              {isSubmitting ? "Signing in..." : "Sign in"}
+            </Button>
+          </form>
+
+          {googleAuthEnabled ? (
+            <>
+              <div className="flex items-center gap-3 text-muted-foreground text-xs">
+                <Separator className="flex-1" />
+                <span>or</span>
+                <Separator className="flex-1" />
+              </div>
+              <SocialAuth
+                loadingProvider={loadingProvider}
+                mode="login"
+                onClick={handleSocialSignIn}
+              />
+            </>
+          ) : null}
+        </CardPanel>
+
+        <CardFooter>
+          <Button
+            className="w-full"
+            render={<Link href="/">Back to home</Link>}
+            variant="outline"
           />
-
-          <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? "Signing in..." : "Sign in"}
-          </Button>
-        </form>
-
-        {googleAuthEnabled ? (
-          <>
-            <div className="my-8 flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="h-px flex-1 bg-border" />
-              <span>or</span>
-              <span className="h-px flex-1 bg-border" />
-            </div>
-            <SocialAuth
-              onClick={handleSocialSignIn}
-              mode="login"
-              loadingProvider={loadingProvider}
-            />
-          </>
-        ) : null}
-
-        <Button asChild variant="outline" className="mt-8 w-full">
-          <Link href="/">Back to home</Link>
-        </Button>
-      </section>
+        </CardFooter>
+      </Card>
     </main>
   );
 }

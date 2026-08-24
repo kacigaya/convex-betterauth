@@ -24,6 +24,7 @@ The application supports email/password registration, sign-in, sign-out, authent
 - Convex with `@convex-dev/better-auth`
 - Better Auth
 - TypeScript and Tailwind CSS 4
+- [coss ui](https://coss.com/ui) components on Base UI
 - Bun for package management and tests
 
 ## Requirements

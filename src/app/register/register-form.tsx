@@ -8,10 +8,19 @@ import { PasswordField } from "@/components/input/password-field";
 import SocialAuth, {
   type SocialProvider,
 } from "@/components/social-auth";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardPanel,
+  CardTitle,
+} from "@/components/ui/card";
+import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { LabelInputContainer } from "@/components/ui/label-input-container";
+import { Separator } from "@/components/ui/separator";
 import { authClient } from "@/lib/auth-client";
 import { getPasswordIssues } from "@/lib/password-strength";
 
@@ -100,123 +109,117 @@ export function RegisterForm({
     }
   };
 
-  const errorId = error ? "register-error" : undefined;
-
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-white px-4 py-12 dark:bg-black">
-      <section className="mx-auto w-full max-w-md rounded-none bg-white p-4 shadow-input md:rounded-2xl md:p-8 dark:bg-black">
-        <AuthLogo />
-        <h1 className="mt-4 text-balance text-2xl font-bold text-neutral-800 dark:text-neutral-200">
-          Create your account
-        </h1>
-        <p className="mt-2 max-w-sm text-pretty text-sm text-neutral-600 dark:text-neutral-300">
-          Add your details to get started.{" "}
-          <Link
-            href="/login"
-            className="font-medium text-blue-700 underline-offset-4 hover:underline dark:text-blue-400"
+    <main className="flex min-h-dvh items-center justify-center px-4 py-12">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <AuthLogo />
+          <CardTitle className="mt-4">Create your account</CardTitle>
+          <CardDescription>
+            Add your details to get started.{" "}
+            <Link
+              className="text-foreground underline underline-offset-4"
+              href="/login"
+            >
+              Sign in instead
+            </Link>
+          </CardDescription>
+        </CardHeader>
+
+        <CardPanel className="flex flex-col gap-4">
+          {error ? (
+            <Alert variant="error">
+              <AlertDescription className="whitespace-pre-line">
+                {error}
+              </AlertDescription>
+            </Alert>
+          ) : null}
+
+          <form
+            aria-busy={isSubmitting}
+            className="flex flex-col gap-4"
+            onSubmit={handleSubmit}
           >
-            Sign in instead
-          </Link>
-        </p>
+            <Field>
+              <FieldLabel>Name</FieldLabel>
+              <Input
+                autoComplete="name"
+                maxLength={80}
+                name="name"
+                onChange={(event) => setName(event.target.value)}
+                placeholder="Your name"
+                required
+                type="text"
+                value={name}
+              />
+            </Field>
 
-        {error ? (
-          <p
-            role="alert"
-            id="register-error"
-            className="mt-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm whitespace-pre-line text-red-700 dark:border-red-800 dark:bg-red-950 dark:text-red-300"
-          >
-            {error}
-          </p>
-        ) : null}
+            <Field>
+              <FieldLabel>Email address</FieldLabel>
+              <Input
+                autoComplete="email"
+                name="email"
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@example.com"
+                required
+                type="email"
+                value={email}
+              />
+            </Field>
 
-        <form
-          className="my-8 space-y-4"
-          onSubmit={handleSubmit}
-          aria-busy={isSubmitting}
-        >
-          <LabelInputContainer>
-            <Label htmlFor="register-name">Name</Label>
-            <Input
-              id="register-name"
-              name="name"
-              type="text"
-              autoComplete="name"
+            <PasswordField
+              autoComplete="new-password"
+              label="Password"
+              maxLength={128}
+              minLength={8}
+              name="password"
+              onChange={(event) => setPassword(event.target.value)}
               required
-              maxLength={80}
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              aria-describedby={errorId}
-              placeholder="Your name"
+              showRequirements
+              value={password}
             />
-          </LabelInputContainer>
 
-          <LabelInputContainer>
-            <Label htmlFor="register-email">Email address</Label>
-            <Input
-              id="register-email"
-              name="email"
-              type="email"
-              autoComplete="email"
+            <PasswordField
+              autoComplete="new-password"
+              label="Confirm password"
+              matchValue={password}
+              maxLength={128}
+              minLength={8}
+              name="passwordConfirmation"
+              onChange={(event) => setConfirmPassword(event.target.value)}
               required
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              aria-describedby={errorId}
-              placeholder="you@example.com"
+              value={confirmPassword}
             />
-          </LabelInputContainer>
 
-          <PasswordField
-            id="register-password"
-            label="Password"
-            name="password"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            maxLength={128}
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            aria-describedby={errorId}
-            showRequirements
+            <Button className="w-full" loading={isSubmitting} type="submit">
+              {isSubmitting ? "Creating account..." : "Create account"}
+            </Button>
+          </form>
+
+          {googleAuthEnabled ? (
+            <>
+              <div className="flex items-center gap-3 text-muted-foreground text-xs">
+                <Separator className="flex-1" />
+                <span>or</span>
+                <Separator className="flex-1" />
+              </div>
+              <SocialAuth
+                loadingProvider={loadingProvider}
+                mode="register"
+                onClick={handleSocialSignUp}
+              />
+            </>
+          ) : null}
+        </CardPanel>
+
+        <CardFooter>
+          <Button
+            className="w-full"
+            render={<Link href="/">Back to home</Link>}
+            variant="outline"
           />
-
-          <PasswordField
-            id="register-password-confirmation"
-            label="Confirm password"
-            name="passwordConfirmation"
-            autoComplete="new-password"
-            required
-            minLength={8}
-            maxLength={128}
-            value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
-            aria-describedby={errorId}
-            matchValue={password}
-          />
-
-          <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? "Creating account..." : "Create account"}
-          </Button>
-        </form>
-
-        {googleAuthEnabled ? (
-          <>
-            <div className="my-8 flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="h-px flex-1 bg-border" />
-              <span>or</span>
-              <span className="h-px flex-1 bg-border" />
-            </div>
-            <SocialAuth
-              onClick={handleSocialSignUp}
-              mode="register"
-              loadingProvider={loadingProvider}
-            />
-          </>
-        ) : null}
-
-        <Button asChild variant="outline" className="mt-8 w-full">
-          <Link href="/">Back to home</Link>
-        </Button>
-      </section>
+        </CardFooter>
+      </Card>
     </main>
   );
 }

@@ -23,11 +23,10 @@ export function getStrengthScore(password: string): number {
 }
 
 export function getStrengthColor(score: number): string {
-  if (score === 0) return "bg-border";
-  if (score <= 1) return "bg-red-500";
-  if (score <= 2) return "bg-orange-500";
-  if (score === 3) return "bg-amber-500";
-  return "bg-emerald-500";
+  if (score === 0) return "bg-input";
+  if (score <= 2) return "bg-destructive";
+  if (score === 3) return "bg-warning";
+  return "bg-success";
 }
 
 export function getStrengthText(score: number): string {

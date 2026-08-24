@@ -8,8 +8,17 @@ import { useRouter } from "next/navigation";
 import type { api } from "../../convex/_generated/api";
 import { AuthLogo } from "@/components/auth-logo";
 import DarkModeToggle from "@/components/darkmode-toggle";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardPanel,
+  CardTitle,
+} from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 
 const dateFormatter = new Intl.DateTimeFormat("en", {
   dateStyle: "medium",
@@ -48,88 +57,88 @@ export function HomeContent({
 
   if (!user) {
     return (
-      <main className="flex min-h-dvh items-center justify-center bg-white px-4 dark:bg-black">
-        <section className="mx-auto w-full max-w-xl rounded-none bg-white p-4 shadow-input md:rounded-2xl md:p-8 dark:bg-black">
-          <div className="flex justify-center">
-            <DarkModeToggle />
-          </div>
-          <div className="mt-4">
+      <main className="flex min-h-dvh items-center justify-center px-4 py-12">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <div className="flex justify-center">
+              <DarkModeToggle />
+            </div>
             <AuthLogo />
-          </div>
-          <h1 className="mt-4 text-balance text-center text-2xl font-bold text-neutral-800 dark:text-neutral-200">
-            Convex + Better Auth
-          </h1>
-          <p className="mt-2 max-w-xl text-pretty text-center text-sm text-neutral-600 dark:text-neutral-300">
-            Open source authentication for Next.js by{" "}
-            <Link
-              href="https://github.com/gayakaci20"
-              className="font-bold text-neutral-700 underline-offset-4 hover:underline dark:text-neutral-200"
-            >
-              Gaya KACI
-            </Link>
-          </p>
-          <div className="my-8 grid grid-cols-1 gap-3">
-            <Button asChild>
-              <Link href="/login">Sign in</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/register">Create account</Link>
-            </Button>
-          </div>
-        </section>
+            <CardTitle className="mt-4 text-center">
+              Convex + Better Auth
+            </CardTitle>
+            <CardDescription className="text-center">
+              Open source authentication for Next.js by{" "}
+              <Link
+                className="text-foreground underline underline-offset-4"
+                href="https://github.com/gayakaci20"
+              >
+                Gaya KACI
+              </Link>
+            </CardDescription>
+          </CardHeader>
+          <CardPanel className="flex flex-col gap-2">
+            <Button className="w-full" render={<Link href="/login">Sign in</Link>} />
+            <Button
+              className="w-full"
+              render={<Link href="/register">Create account</Link>}
+              variant="outline"
+            />
+          </CardPanel>
+        </Card>
       </main>
     );
   }
 
   return (
-    <main className="min-h-dvh bg-white dark:bg-black">
-      <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
-        <section className="rounded-2xl border border-slate-200 bg-white/80 shadow-sm dark:border-slate-700 dark:bg-black/80">
-          <div className="p-6 sm:p-8">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h1 className="text-balance text-2xl font-semibold text-slate-900 dark:text-slate-100">
-                  Welcome back, {user.name || user.email}!
-                </h1>
-                <p className="mt-1 text-pretty text-slate-600 dark:text-slate-400">
-                  You are authenticated with Convex + Better Auth.
-                </p>
-              </div>
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={handleLogout}
-                disabled={isSigningOut}
-              >
-                {isSigningOut ? "Signing out..." : "Sign out"}
-              </Button>
-            </div>
-
-            {signOutError ? (
-              <p
-                role="alert"
-                className="mt-4 text-sm text-red-700 dark:text-red-400"
-              >
-                {signOutError}
-              </p>
-            ) : null}
-
-            <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-black">
-              <h2 className="text-base font-medium text-slate-900 dark:text-slate-100">
-                User information
-              </h2>
-              <dl className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <UserDetail label="User ID" value={user._id} mono />
-                <UserDetail label="Email" value={user.email} />
-                <UserDetail label="Name" value={user.name || "Not set"} />
-                <UserDetail
-                  label="Created"
-                  value={dateFormatter.format(user._creationTime)}
-                />
-              </dl>
-            </div>
+    <main className="min-h-dvh px-4 py-10 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-3xl flex-col gap-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-balance font-semibold text-2xl">
+              Welcome back, {user.name || user.email}
+            </h1>
+            <p className="text-pretty text-muted-foreground text-sm">
+              You are authenticated with Convex + Better Auth.
+            </p>
           </div>
-        </section>
+          <div className="flex items-center gap-2">
+            <DarkModeToggle />
+            <Button
+              loading={isSigningOut}
+              onClick={handleLogout}
+              variant="destructive-outline"
+            >
+              Sign out
+            </Button>
+          </div>
+        </div>
+
+        {signOutError ? (
+          <Alert variant="error">
+            <AlertDescription>{signOutError}</AlertDescription>
+          </Alert>
+        ) : null}
+
+        <Card>
+          <CardHeader>
+            <CardTitle>User information</CardTitle>
+            <CardDescription>
+              Session details returned by the Convex query.
+            </CardDescription>
+          </CardHeader>
+          <CardPanel>
+            <dl className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2">
+              <UserDetail label="User ID" mono value={user._id} />
+              <UserDetail label="Email" value={user.email} />
+              <UserDetail label="Name" value={user.name || "Not set"} />
+              <UserDetail
+                label="Created"
+                value={dateFormatter.format(user._creationTime)}
+              />
+            </dl>
+          </CardPanel>
+        </Card>
       </div>
     </main>
   );
@@ -145,13 +154,11 @@ function UserDetail({
   mono?: boolean;
 }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-3 dark:border-slate-700 dark:bg-slate-900">
-      <dt className="text-xs font-medium uppercase text-slate-500 dark:text-slate-400">
+    <div className="flex flex-col gap-1 bg-card p-4">
+      <dt className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
         {label}
       </dt>
-      <dd
-        className={`mt-1 break-words text-sm text-slate-900 dark:text-slate-100 ${mono ? "font-mono" : ""}`}
-      >
+      <dd className={cn("break-words text-sm", mono && "font-mono")}>
         {value}
       </dd>
     </div>

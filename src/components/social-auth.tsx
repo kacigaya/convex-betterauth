@@ -1,8 +1,6 @@
-import {
-  RiGoogleFill,
-} from "@remixicon/react"
+import { RiGoogleFill } from "@remixicon/react";
 
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 
 export type SocialProvider = (typeof providers)[number]["id"];
 
@@ -14,7 +12,7 @@ interface SocialAuthProps {
 }
 
 const providers = [
-  { id: "google", label: "Google", icon: RiGoogleFill, bg: "bg-[#DB4437]", hover: "hover:bg-[#DB4437]/90" },
+  { id: "google", label: "Google", icon: RiGoogleFill },
 ] as const;
 
 export default function SocialAuth({
@@ -23,7 +21,7 @@ export default function SocialAuth({
   enabled = true,
   loadingProvider = null,
 }: SocialAuthProps) {
-  const actionText = mode === "login" ? "Login" : "Register";
+  const actionText = mode === "login" ? "Sign in" : "Sign up";
 
   if (!enabled) {
     return null;
@@ -31,19 +29,17 @@ export default function SocialAuth({
 
   return (
     <div className="flex flex-col gap-2">
-      {providers.map(({ id, label, icon: Icon, bg, hover }) => (
+      {providers.map(({ id, label, icon: Icon }) => (
         <Button
+          className="w-full"
+          disabled={loadingProvider !== null && loadingProvider !== id}
           key={id}
-          type="button"
-          className={`${bg} text-white after:flex-1 ${hover}`}
+          loading={loadingProvider === id}
           onClick={() => onClick(id)}
-          disabled={loadingProvider !== null}
-          aria-busy={loadingProvider === id}
+          variant="outline"
         >
-          <span className="pointer-events-none me-2 flex-1">
-            <Icon className="opacity-60" size={16} aria-hidden="true" />
-          </span>
-          {loadingProvider === id ? "Connecting..." : `${actionText} with ${label}`}
+          <Icon aria-hidden="true" />
+          {`${actionText} with ${label}`}
         </Button>
       ))}
     </div>
