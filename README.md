@@ -1,189 +1,146 @@
-<p align="center" style="display: flex; justify-content: center; align-items: center; gap: 40px;">
-  <img src="public/convex.ico" alt="Logo" width="200">
-  <img src="public/betterauth-white.png" alt="Logo" width="200">
-</p>
-
-<h1 align="center">Convex + BetterAuth</h1>
-
 <p align="center">
-   <strong>A modern authentication application built with Next.js</strong><br>
-   <em>Featuring Convex as the backend-as-a-service and BetterAuth for authentication management.</em>
+  <img src="public/convex.ico" alt="Convex" width="160">
+  <img src="public/betterauth-white.png" alt="Better Auth" width="160">
 </p>
 
-This project demonstrates a complete authentication flow with user registration, login, and session management.
+<h1 align="center">Convex + Better Auth</h1>
 
-## Features
+<p align="center">A small Next.js App Router example with Convex-backed authentication.</p>
 
-- Complete authentication system with BetterAuth
-- Real-time data synchronization with Convex
-- Modern UI with Tailwind CSS v4 and Radix UI components
-- Dark mode support with system preference detection
-- Social authentication (Google)
-- Password strength validation with visual feedback
-- TypeScript for type safety
+The application supports email/password registration, sign-in, sign-out, authenticated server rendering, and optional Google OAuth. The home page is public and shows account details only when Convex validates the current session.
 
-## Tech Stack
+## Stack
 
-- **Framework**: [Next.js 16](https://nextjs.org) with App Router and Turbopack
-- **Frontend**: [React 19](https://react.dev), TypeScript
-- **Styling**: [Tailwind CSS v4](https://tailwindcss.com), [Radix UI](https://www.radix-ui.com), [shadcn/ui](https://ui.shadcn.com)
-- **Backend**: [Convex](https://convex.dev) (Backend-as-a-Service)
-- **Authentication**: [BetterAuth](https://better-auth.com) via [@convex-dev/better-auth](https://labs.convex.dev/better-auth)
-- **Animations**: [Motion](https://motion.dev) (formerly Framer Motion)
-- **Icons**: [Lucide React](https://lucide.dev), [Remix Icon](https://remixicon.com)
+- Next.js 16 and React 19
+- Convex with `@convex-dev/better-auth`
+- Better Auth
+- TypeScript and Tailwind CSS 4
+- Bun for package management and tests
 
-## Prerequisites
+## Requirements
 
-Before you begin, ensure you have the following installed:
-- [Bun](https://bun.sh) (recommended) or Node.js 20.9+
-- A Convex account ([convex.dev](https://convex.dev))
+- [Bun](https://bun.sh/)
+- A [Convex](https://www.convex.dev/) account
 
-## Setup Instructions
+## Local setup
 
-### 1. Clone the Repository
+Clone and install the project:
 
 ```bash
-git clone https://github.com/gayakaci20/convex-betterauth
+git clone https://github.com/kacigaya/convex-betterauth.git
 cd convex-betterauth
-```
-
-### 2. Install Dependencies
-
-```bash
 bun install
 ```
 
-### 3. Environment Configuration
-
-Create a `.env.local` file and configure the following variables:
-
-```env
-# Convex Configuration
-CONVEX_DEPLOYMENT=dev:your-deployment-name
-NEXT_PUBLIC_CONVEX_URL=https://your-deployment.convex.cloud
-NEXT_PUBLIC_CONVEX_SITE_URL=https://your-deployment.convex.site
-
-# BetterAuth Configuration
-BETTER_AUTH_SECRET=your-super-secret-key-here
-
-# Local Development
-SITE_URL=http://localhost:3000
-
-# Social OAuth (optional)
-GOOGLE_CLIENT_ID=your-client-id
-GOOGLE_CLIENT_SECRET=your-client-secret
-```
-
-#### Environment Variables Explained:
-
-- **CONVEX_DEPLOYMENT**: Your Convex deployment identifier (from the Convex dashboard)
-- **NEXT_PUBLIC_CONVEX_URL**: Your Convex deployment URL (public, used by client)
-- **NEXT_PUBLIC_CONVEX_SITE_URL**: Your Convex site URL for authentication
-- **BETTER_AUTH_SECRET**: A secure secret key for BetterAuth (generate a strong random string)
-- **SITE_URL**: Your application URL (localhost for development)
-
-### 4. Set Up Convex
-
-1. **Create a Convex account** at [convex.dev](https://convex.dev)
-
-2. **Initialize Convex in your project**:
-   ```bash
-   bunx convex dev
-   ```
-
-   This will create a new Convex deployment and generate the necessary configuration.
-
-3. **Update your `.env.local`** with the values provided by Convex CLI
-
-### 5. Generate BetterAuth Secret
+Start Convex and follow its prompts to create or select a development deployment:
 
 ```bash
-openssl rand -base64 32
+bunx convex dev
 ```
 
-Add this secret to your `.env.local` file as `BETTER_AUTH_SECRET`.
+The Convex CLI creates `.env.local` with `CONVEX_DEPLOYMENT`, `NEXT_PUBLIC_CONVEX_URL`, and `NEXT_PUBLIC_CONVEX_SITE_URL`. Keep that process running while developing.
 
-### 6. Run the Development Server
+Set the private Better Auth values on the Convex deployment, not in the Next.js environment:
+
+```bash
+bunx convex env set BETTER_AUTH_SECRET "$(openssl rand -base64 32)"
+bunx convex env set SITE_URL http://localhost:3000
+```
+
+`.env.example` documents the frontend variables. If the Convex CLI has not created `.env.local` yet, copy it as a starting point:
+
+```bash
+cp .env.example .env.local
+```
+
+If `.env.local` already exists, do not run that copy command. Keep the Convex-generated values and add optional frontend settings manually.
+
+Start Next.js in another terminal:
 
 ```bash
 bun run dev
 ```
 
-The application will be available at [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000).
 
-## Project Structure
+## Environment variables
 
-```
-convex-betterauth/
-├── convex/                    # Convex backend
-│   ├── auth.config.ts         # OAuth provider configuration
-│   ├── auth.ts                # Auth functions and user queries
-│   ├── http.ts                # HTTP router for auth endpoints
-│   └── convex.config.ts       # Convex app configuration
-├── src/
-│   ├── app/                   # Next.js App Router
-│   │   ├── api/auth/[...all]/ # BetterAuth API handler
-│   │   ├── login/             # Login page
-│   │   ├── register/          # Registration page
-│   │   ├── convex.tsx         # Convex client provider
-│   │   ├── layout.tsx         # Root layout (providers)
-│   │   └── page.tsx           # Home page
-│   ├── components/
-│   │   ├── ui/                # Base UI components (button, input, label, etc.)
-│   │   ├── buttons/           # Page-specific button components
-│   │   ├── input/             # Password input with strength validation
-│   │   ├── social-auth.tsx    # Social login/register buttons
-│   │   ├── darkmode-toggle.tsx
-│   │   └── theme-provider.tsx # Dark mode context provider
-│   └── lib/
-│       ├── auth-client.ts     # BetterAuth client setup
-│       ├── password-strength.ts # Shared password validation
-│       └── utils.ts           # Utility functions (cn)
-├── public/                    # Static assets
-└── package.json
+Next.js reads these from `.env.local` or the hosting platform:
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `CONVEX_DEPLOYMENT` | Development only | Selects the Convex deployment for CLI commands. |
+| `NEXT_PUBLIC_CONVEX_URL` | Yes | Public Convex API URL. |
+| `NEXT_PUBLIC_CONVEX_SITE_URL` | Yes | Public Convex HTTP Actions URL used by Better Auth. |
+| `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` | No | Set to `true` only when Google credentials are configured on Convex. |
+
+Convex deployment environment variables:
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `BETTER_AUTH_SECRET` | Yes | Random secret with at least 32 characters. Use a different value per environment. |
+| `SITE_URL` | Yes | Canonical Next.js origin, without a trailing slash. |
+| `GOOGLE_CLIENT_ID` | For Google OAuth | Google OAuth client ID. |
+| `GOOGLE_CLIENT_SECRET` | For Google OAuth | Google OAuth client secret. |
+
+Google credentials must be configured together:
+
+```bash
+bunx convex env set GOOGLE_CLIENT_ID your-client-id
+bunx convex env set GOOGLE_CLIENT_SECRET your-client-secret
 ```
 
-## Available Scripts
+Then set `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true` in the matching Next.js environment. The Google callback URL is:
 
-- `bun run dev` - Start development server with Turbopack
-- `bun run build` - Build for production
-- `bun run start` - Start production server
-- `bun run lint` - Run ESLint
+```text
+https://your-deployment.convex.site/api/auth/callback/google
+```
 
-## Authentication Flow
+## Commands
 
-1. **User Registration** (`/register`) - Create new accounts with email/password or social providers
-2. **User Login** (`/login`) - Sign in with credentials or social providers
-3. **Session Management** - Real-time session validation via Convex
-4. **Protected Content** - Authenticated users see their profile on the home page
+```bash
+bun run dev        # Start Next.js development mode
+bun run lint       # Run ESLint
+bun run typecheck  # Run TypeScript without emitting files
+bun run test       # Run focused tests
+bun run build      # Create the production build
+bun run start      # Serve the production build
+```
 
-## Deployment
+Run `bunx convex dev` while editing Convex functions. It generates the typed client API and validates the backend against the selected deployment.
 
-### Vercel (Recommended)
+## Architecture
 
-1. Push your code to a Git repository
-2. Connect your repository to Vercel
-3. Configure environment variables in Vercel dashboard
-4. Deploy
+- `convex/auth.ts` owns Better Auth configuration, password enforcement, rate limiting, and the authenticated user query.
+- `convex/http.ts` exposes Better Auth through Convex HTTP Actions.
+- `src/lib/auth-server.ts` centralizes the Next.js server integration.
+- `src/app/api/auth/[...all]/route.ts` proxies same-origin auth requests to Convex.
+- `src/app/page.tsx` preloads the authenticated Convex query with a server-issued token.
+- `src/app/convex.tsx` hydrates the client provider with that token.
+- `/login` and `/register` redirect authenticated sessions on the server.
 
-### Other Platforms
+The home route is intentionally public. Authentication changes what it renders; it is not a protected application route. Any future private Convex query or mutation must validate identity inside its Convex handler. UI checks and Next.js redirects are not authorization boundaries.
 
-Ensure you set the environment variables on your deployment platform and update the `SITE_URL` to match your production domain.
+## Production deployment
 
-## Troubleshooting
+1. Deploy Convex with `bunx convex deploy` and note the production `.cloud` and `.site` URLs.
+2. Set `BETTER_AUTH_SECRET` and the production `SITE_URL` on the production Convex deployment. Add Google credentials there only if OAuth is enabled.
+3. Configure the three public Next.js variables on the hosting platform. `NEXT_PUBLIC_GOOGLE_AUTH_ENABLED` must match the Convex OAuth configuration.
+4. Build and deploy Next.js.
+5. Test registration, sign-in, sign-out, session persistence, and OAuth callbacks against the production origin.
 
-### Common Issues
+Do not reuse development secrets in production or expose Convex deployment secrets through `NEXT_PUBLIC_*` variables.
 
-1. **Convex connection errors**: Verify your `CONVEX_DEPLOYMENT` and `NEXT_PUBLIC_CONVEX_URL` are correct
-2. **Authentication not working**: Check that `BETTER_AUTH_SECRET` is set and `SITE_URL` matches your current domain
-3. **Build errors**: Ensure all environment variables are properly set
+## Deliberate limitation
 
-### Getting Help
+Email ownership verification and password-reset email are not enabled because this repository has no outbound email provider. Add a real email transport and Better Auth verification/reset callbacks before using email identity as a trust signal. See [SECURITY_REVIEW.md](SECURITY_REVIEW.md) for the current security boundary.
 
-- [Convex Documentation](https://docs.convex.dev)
-- [BetterAuth Documentation](https://better-auth.com)
-- [Convex + BetterAuth Guide](https://labs.convex.dev/better-auth)
-- [Next.js Documentation](https://nextjs.org/docs)
+## Documentation
+
+- [Convex documentation](https://docs.convex.dev/)
+- [Better Auth documentation](https://www.better-auth.com/docs)
+- [Convex Better Auth component](https://labs.convex.dev/better-auth)
+- [Next.js documentation](https://nextjs.org/docs)
 
 ## License
 
