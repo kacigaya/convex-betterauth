@@ -8,7 +8,11 @@ import authConfig from "./auth.config";
 
 const siteUrl = process.env.SITE_URL!;
 
-export const authComponent = createClient<DataModel>(components.betterAuth);
+// `adapterTest` is development-only component API. Narrowing to the runtime
+// adapter keeps checked-in generated types compatible across component patches.
+export const authComponent = createClient<DataModel>({
+  adapter: components.betterAuth.adapter,
+});
 
 export const createAuth = (
   ctx: GenericCtx<DataModel>,
