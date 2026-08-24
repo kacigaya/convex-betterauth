@@ -1,7 +1,7 @@
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
 import { convex } from "@convex-dev/better-auth/plugins";
 import { APIError, createAuthMiddleware } from "better-auth/api";
-import { betterAuth } from "better-auth";
+import { betterAuth } from "better-auth/minimal";
 import { components } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
@@ -35,11 +35,7 @@ const socialProviders =
     ? { google: { clientId: googleClientId, clientSecret: googleClientSecret } }
     : {};
 
-// `adapterTest` is development-only component API. Narrowing to the runtime
-// adapter keeps checked-in generated types compatible across component patches.
-export const authComponent = createClient<DataModel>({
-  adapter: components.betterAuth.adapter,
-});
+export const authComponent = createClient<DataModel>(components.betterAuth);
 
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
   return betterAuth({

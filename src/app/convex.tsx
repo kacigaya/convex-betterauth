@@ -17,6 +17,8 @@ export function ConvexClientProvider({
   return (
     <ConvexBetterAuthProvider
       client={convex}
+      // @ts-expect-error The component's AuthClient type was emitted against
+      // Better Auth 1.6.15. Its runtime contract matches patched 1.6.x clients.
       authClient={authClient}
       initialToken={initialToken}
     >

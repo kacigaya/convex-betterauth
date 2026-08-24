@@ -11,6 +11,11 @@ import DarkModeToggle from "@/components/darkmode-toggle";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
 
+const dateFormatter = new Intl.DateTimeFormat("en", {
+  dateStyle: "medium",
+  timeZone: "UTC",
+});
+
 export function HomeContent({
   preloadedUser,
 }: {
@@ -119,7 +124,7 @@ export function HomeContent({
                 <UserDetail label="Name" value={user.name || "Not set"} />
                 <UserDetail
                   label="Created"
-                  value={new Date(user._creationTime).toLocaleDateString()}
+                  value={dateFormatter.format(user._creationTime)}
                 />
               </dl>
             </div>
