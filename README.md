@@ -18,6 +18,16 @@
 
 The application supports email/password registration, sign-in, sign-out, authenticated server rendering, and optional Google OAuth. The home page is public and shows account details only when Convex validates the current session.
 
+A password reset screen lives at `/reset-password` and handles the token Better Auth appends to its emailed link. Sending that email requires `emailAndPassword.sendResetPassword` in `convex/auth.ts`, which this example leaves unconfigured.
+
+## Screenshots
+
+| | Dark | Light |
+| --- | --- | --- |
+| Sign in | <img src="public/screenshots/login-dark.png" alt="Sign in page in dark mode" width="380"> | <img src="public/screenshots/login-light.png" alt="Sign in page in light mode" width="380"> |
+| Create account | <img src="public/screenshots/register-dark.png" alt="Create account page in dark mode" width="380"> | <img src="public/screenshots/register-light.png" alt="Create account page in light mode" width="380"> |
+| Reset password | <img src="public/screenshots/reset-password-dark.png" alt="Reset password page in dark mode" width="380"> | <img src="public/screenshots/reset-password-light.png" alt="Reset password page in light mode" width="380"> |
+
 ## Stack
 
 - Next.js 16 and React 19
