@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { usePreloadedAuthQuery } from "@convex-dev/better-auth/nextjs/client";
 import type { Preloaded } from "convex/react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { api } from "../../convex/_generated/api";
+import { AuthLogo } from "@/components/auth-logo";
 import DarkModeToggle from "@/components/darkmode-toggle";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
@@ -48,22 +48,8 @@ export function HomeContent({
           <div className="flex justify-center">
             <DarkModeToggle />
           </div>
-          <div className="mt-4 flex justify-center">
-            <Image src="/convex.ico" alt="Convex" width={100} height={100} />
-            <Image
-              src="/betterauth-black.png"
-              alt="Better Auth"
-              width={100}
-              height={100}
-              className="dark:hidden"
-            />
-            <Image
-              src="/betterauth-white.png"
-              alt="Better Auth"
-              width={100}
-              height={100}
-              className="hidden dark:block"
-            />
+          <div className="mt-4">
+            <AuthLogo />
           </div>
           <h1 className="mt-4 text-balance text-center text-2xl font-bold text-neutral-800 dark:text-neutral-200">
             Convex + Better Auth

@@ -12,8 +12,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Convex + BetterAuth",
-  description: "Open source authentication for Next.js with Convex and BetterAuth",
+  title: {
+    default: "Convex + Better Auth",
+    template: "%s | Convex + Better Auth",
+  },
+  description: "Open source authentication for Next.js with Convex and Better Auth.",
 };
 
 export default async function RootLayout({
@@ -26,7 +29,7 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} antialiased transition-colors duration-300 bg-white dark:bg-black`}
+        className={`${inter.variable} bg-white antialiased dark:bg-black`}
       >
         <ThemeProvider defaultTheme="dark">
           <ConvexClientProvider initialToken={initialToken}>
