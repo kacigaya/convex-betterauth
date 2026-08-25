@@ -16,6 +16,7 @@ export function AuthLogo() {
         width={101}
         height={100}
         className="dark:hidden"
+        loading="eager"
       />
       <Image
         src="/betterauth-white.png"
@@ -23,6 +24,7 @@ export function AuthLogo() {
         width={101}
         height={100}
         className="hidden dark:block"
+        loading="eager"
       />
     </div>
   );
