@@ -8,7 +8,7 @@
 <p align="center">A small Next.js App Router example with Convex-backed authentication.</p>
 
 <p align="center">
-  <a href="https://nextjs.org"><img alt="Next.js 16.3.2" src="https://shieldcn.dev/badge/Next.js-16.3.2-171717.svg?variant=secondary&amp;logo=nextdotjs"></a>
+  <a href="https://nextjs.org"><img alt="Next.js 16.3.3" src="https://shieldcn.dev/badge/Next.js-16.3.3-171717.svg?variant=secondary&amp;logo=nextdotjs"></a>
   <a href="https://www.convex.dev"><img alt="Convex 1.45.0" src="https://shieldcn.dev/badge/Convex-1.45.0-ee342f.svg?variant=secondary&amp;logo=convex"></a>
   <a href="https://www.better-auth.com"><img alt="Better Auth 1.6.30" src="https://shieldcn.dev/badge/Better_Auth-1.6.30-171717.svg?variant=secondary&amp;logo=betterauth"></a>
   <a href="https://tailwindcss.com"><img alt="Tailwind CSS 4.3" src="https://shieldcn.dev/badge/Tailwind_CSS-4.3-06b6d4.svg?variant=secondary&amp;logo=tailwindcss"></a>
