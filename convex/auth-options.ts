@@ -17,6 +17,7 @@ type CreateAuthOptionsArgs = {
   socialProviders: BetterAuthOptions["socialProviders"];
   sendEmail: (message: AuthEmailMessage) => Promise<void>;
   emailVerificationExpiresIn?: number;
+  resetPasswordTokenExpiresIn?: number;
 };
 
 export function createAuthOptions({
@@ -26,6 +27,7 @@ export function createAuthOptions({
   socialProviders,
   sendEmail,
   emailVerificationExpiresIn = 3600,
+  resetPasswordTokenExpiresIn = 3600,
 }: CreateAuthOptionsArgs) {
   return {
     baseURL,
@@ -37,6 +39,27 @@ export function createAuthOptions({
       minPasswordLength: 8,
       maxPasswordLength: 128,
       requireEmailVerification: true,
+      sendResetPassword: async ({
+        user,
+        url,
+      }: {
+        user: { email: string };
+        url: string;
+      }) => {
+        await sendEmail({
+          to: user.email,
+          subject: "Reset your password",
+          text: [
+            "Reset your password for Convex + Better Auth:",
+            "",
+            url,
+            "",
+            "This link expires in 1 hour. If you did not request a password reset, ignore this email.",
+          ].join("\n"),
+        });
+      },
+      resetPasswordTokenExpiresIn,
+      revokeSessionsOnPasswordReset: true,
     },
     emailVerification: {
       sendVerificationEmail: async ({
