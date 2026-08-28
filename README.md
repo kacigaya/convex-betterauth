@@ -146,6 +146,12 @@ bun run start      # Serve the production build
 
 Run `bunx convex dev` while editing Convex functions. It generates the typed client API and validates the backend against the selected deployment.
 
+## Continuous integration
+
+GitHub Actions runs on pull requests and pushes to `main`. It installs with Bun 1.3.14 and `bun install --frozen-lockfile`, then runs lint, typecheck, tests, the production build, and `bun audit` in that order.
+
+The build uses public placeholder Convex URLs and disables Google authentication. CI does not connect to Convex, Resend, or Google, and it does not require service credentials or repository secrets.
+
 ## Architecture
 
 - `convex/auth.ts` owns Better Auth configuration, email delivery, password enforcement, rate limiting, and the authenticated user query.
