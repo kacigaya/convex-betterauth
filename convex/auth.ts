@@ -1,12 +1,10 @@
 import { createClient, type GenericCtx } from "@convex-dev/better-auth";
-import { convex } from "@convex-dev/better-auth/plugins";
-import { APIError, createAuthMiddleware } from "better-auth/api";
 import { betterAuth } from "better-auth/minimal";
 import { components } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
-import authConfig from "./auth.config";
-import { getPasswordIssues } from "../src/lib/password-strength";
+import { createAuthOptions } from "./auth-options";
+import { sendResendEmail } from "./email";
 
 const siteUrl = process.env.SITE_URL;
 const secret = process.env.BETTER_AUTH_SECRET;
@@ -19,6 +17,19 @@ if (!secret) {
   throw new Error(
     "BETTER_AUTH_SECRET is required in the Convex deployment environment",
   );
+}
+
+const resendApiKey = process.env.RESEND_API_KEY?.trim();
+const emailFrom = process.env.EMAIL_FROM?.trim();
+
+if (!resendApiKey) {
+  throw new Error(
+    "RESEND_API_KEY is required in the Convex deployment environment",
+  );
+}
+
+if (!emailFrom) {
+  throw new Error("EMAIL_FROM is required in the Convex deployment environment");
 }
 
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
@@ -38,64 +49,23 @@ const socialProviders =
 export const authComponent = createClient<DataModel>(components.betterAuth);
 
 export const createAuth = (ctx: GenericCtx<DataModel>) => {
-  return betterAuth({
-    baseURL: siteUrl,
-    secret,
-    trustedOrigins: [siteUrl],
-    database: authComponent.adapter(ctx),
-    emailAndPassword: {
-      enabled: true,
-      minPasswordLength: 8,
-      maxPasswordLength: 128,
-      requireEmailVerification: false,
-    },
-    socialProviders,
-    rateLimit: {
-      storage: "database",
-    },
-    hooks: {
-      before: createAuthMiddleware(async (request) => {
-        if (request.path !== "/sign-up/email") {
-          return;
-        }
-
-        const password = request.body?.password;
-        const name = request.body?.name;
-
-        if (typeof password !== "string") {
-          throw new APIError("BAD_REQUEST", { message: "Password is required" });
-        }
-
-        const passwordIssues = getPasswordIssues(password);
-        if (passwordIssues.length > 0) {
-          throw new APIError("BAD_REQUEST", {
-            message: passwordIssues.join(". "),
-          });
-        }
-
-        if (typeof name !== "string" || name.trim().length === 0) {
-          throw new APIError("BAD_REQUEST", { message: "Name is required" });
-        }
-
-        if (name.trim().length > 80) {
-          throw new APIError("BAD_REQUEST", {
-            message: "Name must be 80 characters or fewer",
-          });
-        }
-
-        return {
-          context: {
-            ...request,
-            body: {
-              ...request.body,
-              name: name.trim(),
-            },
-          },
-        };
-      }),
-    },
-    plugins: [convex({ authConfig })],
-  });
+  return betterAuth(
+    createAuthOptions({
+      baseURL: siteUrl,
+      secret,
+      database: authComponent.adapter(ctx),
+      socialProviders,
+      sendEmail: async ({ to, subject, text }) => {
+        await sendResendEmail({
+          apiKey: resendApiKey,
+          from: emailFrom,
+          to,
+          subject,
+          text,
+        });
+      },
+    }),
+  );
 };
 
 export const getCurrentUser = query({
