@@ -144,6 +144,13 @@ export function LoginForm({
               value={password}
             />
 
+            <Link
+              className="self-end text-foreground text-sm underline underline-offset-4"
+              href="/forgot-password"
+            >
+              Forgot password?
+            </Link>
+
             <Button className="w-full" loading={isSubmitting} type="submit">
               {isSubmitting ? "Signing in..." : "Sign in"}
             </Button>
