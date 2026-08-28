@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { AuthLogo } from "@/components/auth-logo";
 import { PasswordField } from "@/components/input/password-field";
 import SocialAuth, {
@@ -37,12 +36,7 @@ export function RegisterForm({
   const [loadingProvider, setLoadingProvider] =
     useState<SocialProvider | null>(null);
   const [error, setError] = useState("");
-  const router = useRouter();
-
-  const finishRegistration = () => {
-    router.replace("/");
-    router.refresh();
-  };
+  const [registrationRequested, setRegistrationRequested] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -72,6 +66,7 @@ export function RegisterForm({
         name: trimmedName,
         email: email.trim(),
         password,
+        callbackURL: "/email-verified",
       });
 
       if (result.error) {
@@ -81,7 +76,9 @@ export function RegisterForm({
         return;
       }
 
-      finishRegistration();
+      setPassword("");
+      setConfirmPassword("");
+      setRegistrationRequested(true);
     } catch {
       setError("Could not create the account. Please try again.");
     } finally {
@@ -109,13 +106,55 @@ export function RegisterForm({
     }
   };
 
+  if (registrationRequested) {
+    return (
+      <main className="flex min-h-dvh items-center justify-center px-4 py-12">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <AuthLogo />
+            <CardTitle className="mt-4 text-balance" render={<h1 />}>
+              Check your inbox
+            </CardTitle>
+            <CardDescription className="text-pretty">
+              If an account can be created with those details, a verification
+              link is on its way. Open it before signing in.
+            </CardDescription>
+          </CardHeader>
+
+          <CardPanel>
+            <Alert variant="info">
+              <AlertDescription>
+                Verification links expire after one hour. Check your spam folder
+                if the message does not arrive.
+              </AlertDescription>
+            </Alert>
+          </CardPanel>
+
+          <CardFooter className="flex-col gap-2">
+            <Button
+              className="w-full"
+              render={<Link href="/login">Go to sign in</Link>}
+            />
+            <Button
+              className="w-full"
+              render={<Link href="/">Back to home</Link>}
+              variant="outline"
+            />
+          </CardFooter>
+        </Card>
+      </main>
+    );
+  }
+
   return (
     <main className="flex min-h-dvh items-center justify-center px-4 py-12">
       <Card className="w-full max-w-sm">
         <CardHeader>
           <AuthLogo />
-          <CardTitle className="mt-4">Create your account</CardTitle>
-          <CardDescription>
+          <CardTitle className="mt-4 text-balance" render={<h1 />}>
+            Create your account
+          </CardTitle>
+          <CardDescription className="text-pretty">
             Add your details to get started.{" "}
             <Link
               className="text-foreground underline underline-offset-4"
