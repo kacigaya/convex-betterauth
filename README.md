@@ -174,6 +174,8 @@ The home route is intentionally public. Authentication changes what it renders; 
 
 Do not reuse development secrets in production or expose Convex deployment secrets through `NEXT_PUBLIC_*` variables.
 
+Follow [DEPLOYMENT_VERIFICATION.md](DEPLOYMENT_VERIFICATION.md) for the read-only smoke command, environment separation, and manual production verification matrix. All real infrastructure checks remain pending until someone with deployment access completes and records them.
+
 ## Deliberate limitation
 
 The repository verifies auth behavior with a deterministic in-memory test adapter, but it cannot prove delivery from your Resend account or behavior on your deployed origin. Complete the production checks in [SECURITY_REVIEW.md](SECURITY_REVIEW.md) with real deployment credentials before relying on email identity as a trust signal.
