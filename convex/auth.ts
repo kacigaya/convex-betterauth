@@ -3,7 +3,10 @@ import { betterAuth } from "better-auth/minimal";
 import { components } from "./_generated/api";
 import type { DataModel } from "./_generated/dataModel";
 import { query } from "./_generated/server";
-import { createAuthOptions } from "./auth-options";
+import {
+  createAuthOptions,
+  getGoogleSocialProviders,
+} from "./auth-options";
 import { sendResendEmail } from "./email";
 
 const siteUrl = process.env.SITE_URL;
@@ -32,19 +35,10 @@ if (!emailFrom) {
   throw new Error("EMAIL_FROM is required in the Convex deployment environment");
 }
 
-const googleClientId = process.env.GOOGLE_CLIENT_ID;
-const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
-
-if (Boolean(googleClientId) !== Boolean(googleClientSecret)) {
-  throw new Error(
-    "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be configured together",
-  );
-}
-
-const socialProviders =
-  googleClientId && googleClientSecret
-    ? { google: { clientId: googleClientId, clientSecret: googleClientSecret } }
-    : {};
+const socialProviders = getGoogleSocialProviders({
+  clientId: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+});
 
 export const authComponent = createClient<DataModel>(components.betterAuth);
 

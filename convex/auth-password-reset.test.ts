@@ -1,82 +1,24 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { memoryAdapter, type MemoryDB } from "better-auth/adapters/memory";
 import { APIError } from "better-auth/api";
-import { betterAuth } from "better-auth/minimal";
 import {
-  createAuthOptions,
-  type AuthEmailMessage,
-} from "./auth-options";
+  createTestAuth,
+  linkFromEmail,
+  postAuth,
+  testBaseURL as baseURL,
+  testEmail as email,
+  testPassword as password,
+  type TestAuth,
+  verifyFirstEmail,
+} from "./auth-test-utils";
 
-const baseURL = "http://localhost:3000";
-const email = "user@example.com";
-const password = "CorrectHorse1";
 const newPassword = "BetterBattery2";
 const resetCallbackURL = "/reset-password";
-
-function createMemoryDatabase(): MemoryDB {
-  return {
-    user: [],
-    session: [],
-    account: [],
-    verification: [],
-    rateLimit: [],
-    jwks: [],
-  };
-}
-
-function createTestAuth({
-  expiresIn = 3600,
-  sendEmail,
-}: {
-  expiresIn?: number;
-  sendEmail?: (message: AuthEmailMessage) => Promise<void>;
-} = {}) {
-  const database = createMemoryDatabase();
-  const emails: AuthEmailMessage[] = [];
-  const deliver =
-    sendEmail ??
-    (async (message: AuthEmailMessage) => {
-      emails.push(message);
-    });
-
-  const auth = betterAuth({
-    ...createAuthOptions({
-      baseURL,
-      secret: "test-secret-with-at-least-thirty-two-characters",
-      database: memoryAdapter(database),
-      socialProviders: {},
-      sendEmail: deliver,
-      resetPasswordTokenExpiresIn: expiresIn,
-    }),
-    logger: { disabled: true },
-    advanced: { disableOriginCheck: false },
-    plugins: [],
-  });
-
-  return { auth, database, emails };
-}
-
-type TestAuth = ReturnType<typeof createTestAuth>["auth"];
-
-function linkFromEmail(message: AuthEmailMessage, path: string) {
-  const url = message.text
-    .split("\n")
-    .find((line) => line.startsWith(`${baseURL}${path}`));
-  assert.ok(url, `email should contain a ${path} link`);
-  return new URL(url);
-}
 
 async function requestReset(auth: TestAuth) {
   return auth.api.requestPasswordReset({
     body: { email, redirectTo: resetCallbackURL },
   });
-}
-
-async function verifyUser(auth: TestAuth, emails: AuthEmailMessage[]) {
-  await auth.handler(
-    new Request(linkFromEmail(emails[0], "/api/auth/verify-email")),
-  );
 }
 
 describe("password reset", () => {
@@ -152,7 +94,9 @@ describe("password reset", () => {
       `${baseURL}${resetCallbackURL}?error=INVALID_TOKEN`,
     );
 
-    const { auth, emails } = createTestAuth({ expiresIn: -1 });
+    const { auth, emails } = createTestAuth({
+      resetPasswordTokenExpiresIn: -1,
+    });
     await auth.api.signUpEmail({ body: { name: "Test User", email, password } });
     emails.length = 0;
     await requestReset(auth);
@@ -214,6 +158,33 @@ describe("password reset", () => {
     );
   });
 
+  test("rejects an invalid token without changing the existing password", async () => {
+    const { auth, emails } = createTestAuth();
+    await auth.api.signUpEmail({
+      body: {
+        name: "Test User",
+        email,
+        password,
+        callbackURL: "/email-verified",
+      },
+    });
+    await verifyFirstEmail(auth, emails);
+
+    await assert.rejects(
+      auth.api.resetPassword({
+        body: { token: "invalid-token", newPassword },
+      }),
+      (error: unknown) => {
+        assert.ok(error instanceof APIError);
+        assert.equal(error.body?.code, "INVALID_TOKEN");
+        return true;
+      },
+    );
+
+    const login = await auth.api.signInEmail({ body: { email, password } });
+    assert.ok(login.token);
+  });
+
   test("reset is single-use, changes the password, and revokes sessions", async () => {
     const { auth, database, emails } = createTestAuth();
     await auth.api.signUpEmail({
@@ -224,8 +195,14 @@ describe("password reset", () => {
         callbackURL: "/email-verified",
       },
     });
-    await verifyUser(auth, emails);
-    await auth.api.signInEmail({ body: { email, password } });
+    await verifyFirstEmail(auth, emails);
+    const initialLogin = await auth.handler(
+      postAuth("/sign-in/email", { email, password }),
+    );
+    const sessionCookie = initialLogin.headers
+      .get("set-cookie")
+      ?.match(/better-auth\.session_token=[^;]+/)?.[0];
+    assert.ok(sessionCookie);
     assert.equal(database.session.length, 1);
     emails.length = 0;
     await requestReset(auth);
@@ -240,6 +217,12 @@ describe("password reset", () => {
       { status: true },
     );
     assert.equal(database.session.length, 0);
+    const previousSession = await auth.handler(
+      new Request(`${baseURL}/api/auth/get-session`, {
+        headers: { Cookie: sessionCookie },
+      }),
+    );
+    assert.equal(await previousSession.json(), null);
 
     await assert.rejects(
       auth.api.resetPassword({ body: { token, newPassword } }),
