@@ -92,6 +92,25 @@ export function createAuthOptions({
     },
     hooks: {
       before: createAuthMiddleware(async (request) => {
+        if (request.path === "/reset-password") {
+          const newPassword = request.body?.newPassword;
+
+          if (typeof newPassword !== "string") {
+            throw new APIError("BAD_REQUEST", {
+              message: "Password is required",
+            });
+          }
+
+          const passwordIssues = getPasswordIssues(newPassword);
+          if (passwordIssues.length > 0) {
+            throw new APIError("BAD_REQUEST", {
+              message: passwordIssues.join(". "),
+            });
+          }
+
+          return;
+        }
+
         if (request.path !== "/sign-up/email") {
           return;
         }
