@@ -16,6 +16,7 @@ type CreateAuthOptionsArgs = {
   database: BetterAuthOptions["database"];
   socialProviders: BetterAuthOptions["socialProviders"];
   sendEmail: (message: AuthEmailMessage) => Promise<void>;
+  emailVerificationExpiresIn?: number;
 };
 
 export function createAuthOptions({
@@ -24,6 +25,7 @@ export function createAuthOptions({
   database,
   socialProviders,
   sendEmail,
+  emailVerificationExpiresIn = 3600,
 }: CreateAuthOptionsArgs) {
   return {
     baseURL,
@@ -59,7 +61,7 @@ export function createAuthOptions({
       sendOnSignUp: true,
       sendOnSignIn: true,
       autoSignInAfterVerification: false,
-      expiresIn: 3600,
+      expiresIn: emailVerificationExpiresIn,
     },
     socialProviders,
     rateLimit: {
