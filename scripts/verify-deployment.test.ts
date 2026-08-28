@@ -72,13 +72,13 @@ describe("deployment smoke check", () => {
       /returned HTTP 302/,
     );
 
-    let requestCount = 0;
     await assert.rejects(
       verifyDeployment("https://app.example.com", {
-        fetchImpl: async () => {
-          requestCount += 1;
+        fetchImpl: async (input) => {
           return new Response(
-            requestCount === 7 ? JSON.stringify({ user: { id: "user-1" } }) : "ok",
+            input.toString().endsWith("/api/auth/get-session")
+              ? JSON.stringify({ user: { id: "user-1" } })
+              : "ok",
             { status: 200 },
           );
         },
@@ -89,14 +89,15 @@ describe("deployment smoke check", () => {
   });
 
   test("reports an invalid anonymous session response", async () => {
-    let requestCount = 0;
     await assert.rejects(
       verifyDeployment("https://app.example.com", {
-        fetchImpl: async () => {
-          requestCount += 1;
-          return new Response(requestCount === 7 ? "not-json" : "ok", {
-            status: 200,
-          });
+        fetchImpl: async (input) => {
+          return new Response(
+            input.toString().endsWith("/api/auth/get-session")
+              ? "not-json"
+              : "ok",
+            { status: 200 },
+          );
         },
         log: () => {},
       }),
