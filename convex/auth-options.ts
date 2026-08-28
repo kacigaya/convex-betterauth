@@ -20,6 +20,32 @@ type CreateAuthOptionsArgs = {
   resetPasswordTokenExpiresIn?: number;
 };
 
+export function getGoogleSocialProviders({
+  clientId,
+  clientSecret,
+}: {
+  clientId?: string;
+  clientSecret?: string;
+}): BetterAuthOptions["socialProviders"] {
+  const normalizedClientId = clientId?.trim();
+  const normalizedClientSecret = clientSecret?.trim();
+
+  if (Boolean(normalizedClientId) !== Boolean(normalizedClientSecret)) {
+    throw new Error(
+      "GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET must be configured together",
+    );
+  }
+
+  return normalizedClientId && normalizedClientSecret
+    ? {
+        google: {
+          clientId: normalizedClientId,
+          clientSecret: normalizedClientSecret,
+        },
+      }
+    : {};
+}
+
 export function createAuthOptions({
   baseURL,
   secret,
