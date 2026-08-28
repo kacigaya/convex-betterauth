@@ -4,6 +4,7 @@ import { APIError } from "better-auth/api";
 import {
   createTestAuth,
   linkFromEmail,
+  postAuth,
   testBaseURL as baseURL,
   testEmail as email,
   testPassword as password,
@@ -157,6 +158,33 @@ describe("password reset", () => {
     );
   });
 
+  test("rejects an invalid token without changing the existing password", async () => {
+    const { auth, emails } = createTestAuth();
+    await auth.api.signUpEmail({
+      body: {
+        name: "Test User",
+        email,
+        password,
+        callbackURL: "/email-verified",
+      },
+    });
+    await verifyFirstEmail(auth, emails);
+
+    await assert.rejects(
+      auth.api.resetPassword({
+        body: { token: "invalid-token", newPassword },
+      }),
+      (error: unknown) => {
+        assert.ok(error instanceof APIError);
+        assert.equal(error.body?.code, "INVALID_TOKEN");
+        return true;
+      },
+    );
+
+    const login = await auth.api.signInEmail({ body: { email, password } });
+    assert.ok(login.token);
+  });
+
   test("reset is single-use, changes the password, and revokes sessions", async () => {
     const { auth, database, emails } = createTestAuth();
     await auth.api.signUpEmail({
@@ -168,7 +196,13 @@ describe("password reset", () => {
       },
     });
     await verifyFirstEmail(auth, emails);
-    await auth.api.signInEmail({ body: { email, password } });
+    const initialLogin = await auth.handler(
+      postAuth("/sign-in/email", { email, password }),
+    );
+    const sessionCookie = initialLogin.headers
+      .get("set-cookie")
+      ?.match(/better-auth\.session_token=[^;]+/)?.[0];
+    assert.ok(sessionCookie);
     assert.equal(database.session.length, 1);
     emails.length = 0;
     await requestReset(auth);
@@ -183,6 +217,12 @@ describe("password reset", () => {
       { status: true },
     );
     assert.equal(database.session.length, 0);
+    const previousSession = await auth.handler(
+      new Request(`${baseURL}/api/auth/get-session`, {
+        headers: { Cookie: sessionCookie },
+      }),
+    );
+    assert.equal(await previousSession.json(), null);
 
     await assert.rejects(
       auth.api.resetPassword({ body: { token, newPassword } }),
