@@ -53,7 +53,11 @@ export function LoginForm({
       });
 
       if (result.error) {
-        setError("Invalid email or password.");
+        setError(
+          result.error.code === "EMAIL_NOT_VERIFIED"
+            ? "Verify your email before signing in. Check your inbox for a verification link."
+            : "Invalid email or password.",
+        );
         return;
       }
 
@@ -90,8 +94,10 @@ export function LoginForm({
       <Card className="w-full max-w-sm">
         <CardHeader>
           <AuthLogo />
-          <CardTitle className="mt-4">Welcome back</CardTitle>
-          <CardDescription>
+          <CardTitle className="mt-4 text-balance" render={<h1 />}>
+            Welcome back
+          </CardTitle>
+          <CardDescription className="text-pretty">
             Sign in to your account to continue.{" "}
             <Link
               className="text-foreground underline underline-offset-4"
@@ -137,6 +143,13 @@ export function LoginForm({
               required
               value={password}
             />
+
+            <Link
+              className="self-end text-foreground text-sm underline underline-offset-4"
+              href="/forgot-password"
+            >
+              Forgot password?
+            </Link>
 
             <Button className="w-full" loading={isSubmitting} type="submit">
               {isSubmitting ? "Signing in..." : "Sign in"}
