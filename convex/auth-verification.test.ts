@@ -1,60 +1,15 @@
 import assert from "node:assert/strict";
 import { describe, test } from "node:test";
-import { memoryAdapter, type MemoryDB } from "better-auth/adapters/memory";
 import { APIError } from "better-auth/api";
-import { betterAuth } from "better-auth/minimal";
+import type { AuthEmailMessage } from "./auth-options";
 import {
-  createAuthOptions,
-  type AuthEmailMessage,
-} from "./auth-options";
+  createTestAuth,
+  testBaseURL as baseURL,
+  testEmail as email,
+  testPassword as password,
+} from "./auth-test-utils";
 
-const baseURL = "http://localhost:3000";
-const email = "user@example.com";
-const password = "CorrectHorse1";
 const callbackURL = "/verification-result";
-
-function createMemoryDatabase(): MemoryDB {
-  return {
-    user: [],
-    session: [],
-    account: [],
-    verification: [],
-    rateLimit: [],
-    jwks: [],
-  };
-}
-
-function createTestAuth({
-  expiresIn = 3600,
-  sendEmail,
-}: {
-  expiresIn?: number;
-  sendEmail?: (message: AuthEmailMessage) => Promise<void>;
-} = {}) {
-  const database = createMemoryDatabase();
-  const emails: AuthEmailMessage[] = [];
-  const deliver =
-    sendEmail ??
-    (async (message: AuthEmailMessage) => {
-      emails.push(message);
-    });
-
-  const options = createAuthOptions({
-    baseURL,
-    secret: "test-secret-with-at-least-thirty-two-characters",
-    database: memoryAdapter(database),
-    socialProviders: {},
-    sendEmail: deliver,
-    emailVerificationExpiresIn: expiresIn,
-  });
-  const auth = betterAuth({
-    ...options,
-    logger: { disabled: true },
-    plugins: [],
-  });
-
-  return { auth, database, emails };
-}
 
 async function signUp(
   auth: ReturnType<typeof createTestAuth>["auth"],
@@ -142,7 +97,9 @@ describe("email verification", () => {
   });
 
   test("expired verification token redirects with TOKEN_EXPIRED", async () => {
-    const { auth, emails } = createTestAuth({ expiresIn: -1 });
+    const { auth, emails } = createTestAuth({
+      emailVerificationExpiresIn: -1,
+    });
     await signUp(auth);
 
     const response = await auth.handler(
